@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
       - name: staticwebapp
-        image: rushitechnologiesbalaji/rushitech-static-webapp:2
+        image: rushitechnologiesbalaji/rushitech-static-webapp:1
         ports:
         - containerPort: 80
         resources:

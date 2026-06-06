@@ -2,29 +2,28 @@ pipeline {
     agent any
 
     environment {
-        // GitHub Repository
+      
     GIT_REPO = 'https://github.com/kasettyhemanth/static-web-app.git'
     BRANCH_NAME = 'main'
 
-    // SonarQube Configuration
+    
     SONARQUBE_SERVER = 'SonarQube'
     SONAR_PROJECT_KEY = 'static-web-app'
     SONAR_PROJECT_NAME = 'static-web-app'
 
-    // Nginx Server Configuration
     NGINX_USER = 'ec2-user'
     NGINX_HOST = '98.92.109.2'
     NGINX_PATH = '/usr/share/nginx/html'
 
-    // Jenkins SSH Credential ID
-    SSH_CREDENTIALS = 'ssh-key'
+    
+    SSH_CREDENTIALS = 'nginx_server_SSH_Cred'
 
     }
     stages {
         stage('Checkout Source Code'){
             steps{
-                git branch: "${BRANCH_NAME}",
-                url: "${GIT_REPO}" 
+                git branch: main,
+                url: 'https://github.com/kasettyhemanth/static-web-app.git'
                 echo "Source code checked out successfully."
             }
         }

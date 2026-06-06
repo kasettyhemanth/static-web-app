@@ -45,10 +45,14 @@ pipeline {
     }
     post {
         success {
-            echo "Pipeline executed successfully!"
+            echo "Static website deployed successfully to Nginx Server (${NGINX_HOST})."
         }
         failure {
             echo "Pipeline execution failed."
+        }
+        aiways {
+            cleanWs()
+            echo "Pipeline execution completed."
         }
     }
 }

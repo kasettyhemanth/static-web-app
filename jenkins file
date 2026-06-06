@@ -1,0 +1,88 @@
+pipeline {
+agent any
+
+```
+environment {
+    // GitHub Repository
+    GIT_REPO = 'https://github.com/kasettyhemanth/static-web-app.git'
+    BRANCH_NAME = 'main'
+
+    // SonarQube Configuration
+    SONARQUBE_SERVER = 'SonarQube'
+    SONAR_PROJECT_KEY = 'static-web-app'
+    SONAR_PROJECT_NAME = 'static-web-app'
+
+    // Nginx Server Configuration
+    NGINX_USER = 'ec2-user'
+    NGINX_HOST = '98.92.109.2'
+    NGINX_PATH = '/usr/share/nginx/html'
+
+    // Jenkins SSH Credential ID
+    SSH_CREDENTIALS = 'ssh-key'
+}
+
+stages {
+
+    stage('Checkout Source Code') {
+        steps {
+            git branch: "${BRANCH_NAME}",
+                url: "${GIT_REPO}"
+
+            echo "Source code checked out successfully."
+        }
+    }
+
+    stage('SonarQube Code Analysis') {
+        steps {
+            withSonarQubeEnv("${SONARQUBE_SERVER}") {
+
+                sh """
+                sonar-scanner \
+                -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
+                -Dsonar.projectName=${SONAR_PROJECT_NAME} \
+                -Dsonar.sources=. \
+                -Dsonar.sourceEncoding=UTF-8
+                """
+            }
+        }
+    }
+
+    stage('Quality Gate') {
+        steps {
+            timeout(time: 10, unit: 'MINUTES') {
+                waitForQualityGate abortPipeline: true
+            }
+        }
+    }
+
+    stage('Deploy to Nginx Server') {
+        steps {
+            sshagent(credentials: ["${SSH_CREDENTIALS}"]) {
+
+                sh """
+                rsync -avz --delete \
+                --exclude='.git' \
+                ./ ${NGINX_USER}@${NGINX_HOST}:${NGINX_PATH}/
+                """
+            }
+        }
+    }
+}
+
+post {
+
+    success {
+        echo "Static website deployed successfully to Nginx Server (${NGINX_HOST})."
+    }
+
+    failure {
+        echo "Pipeline execution failed."
+    }
+
+    always {
+        cleanWs()
+    }
+}
+```
+
+}

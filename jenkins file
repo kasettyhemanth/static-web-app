@@ -2,12 +2,8 @@ pipeline {
     agent any
 
     environment {
-      
-    GIT_REPO = 'https://github.com/kasettyhemanth/static-web-app.git'
-    BRANCH_NAME = 'main'
-
     
-    SONARQUBE_SERVER = 'SonarQube'
+    SONARQUBE_SERVER = 'SonarQube_Server'
     SONAR_PROJECT_KEY = 'static-web-app'
     SONAR_PROJECT_NAME = 'static-web-app'
 
@@ -20,11 +16,9 @@ pipeline {
 
     }
     stages {
-        stage('Checkout Source Code'){
+        stage("Git Clone"){
             steps{
-                git branch: main,
-                url: 'https://github.com/kasettyhemanth/static-web-app.git'
-                echo "Source code checked out successfully."
+                git branch: 'main', credentialsId: 'GitHub_Credentials', url: 'https://github.com/kasettyhemanth/static-web-app.git'
             }
         }
         stage('SonarQube Code Analysis'){
